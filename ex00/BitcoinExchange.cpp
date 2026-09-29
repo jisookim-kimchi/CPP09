@@ -65,6 +65,7 @@ bool BitcoinExchange::isValidDate(const std::string &date) const
 }
 
 /** 
+    @brief : trim value fronted white space and behind white space.
     @brief : check if the given string is a valid number for date.
 */
 bool BitcoinExchange::parseDate(const std::string &rawDate, std::string &date) const
@@ -92,7 +93,8 @@ bool BitcoinExchange::parseDate(const std::string &rawDate, std::string &date) c
 }
 
 /**
-    @brief : check if the given string is a '+' number and not exceed the allowed range.
+    @brief : trim value fronted white space and behind white space.
+    @brief : check if the given string is a '+' number and not exceed the allowed range or is not numericaly valid.
 */
 bool BitcoinExchange::parseValue(const std::string &valueStr, double &value) const
 {
@@ -109,30 +111,39 @@ bool BitcoinExchange::parseValue(const std::string &valueStr, double &value) con
         std::cerr << "Error: bad input => " << valueStr << std::endl;
         return false;
     }
-
-    char *endPtr;
-    value = std::strtod(trimmed.c_str(), &endPtr);
-    if (endPtr == trimmed.c_str() || *endPtr != '\0')
+    double num;
+    try
+    {
+        std::size_t endPos = 0;
+        num = std::stod(trimmed, &endPos);
+        if (endPos != trimmed.size())
+        {
+            std::cerr << "Error: bad input => " << trimmed << std::endl;
+            return false;
+        }
+    }
+    catch (const std::exception &)
     {
         std::cerr << "Error: bad input => " << trimmed << std::endl;
         return false;
     }
-
-    if (value < 0)
+    if (num < 0)
     {
         std::cerr << "Error: not a positive number." << std::endl;
         return false;
     }
-    if (value > 1000)
+    if (num > 1000)
     {
         std::cerr << "Error: too large a number." << std::endl;
         return false;
     }
+    value = num;
     return true;
 }
 
 /**
-    @brief 
+    @brief : trim value fronted white space and behind white space.
+    @brief : check if the given string is a '+' number and not exceed the allowed range or is not numericaly valid.
 */
 bool BitcoinExchange::parseRate(const std::string &rateStr, double &rate) const
 {
@@ -147,10 +158,24 @@ bool BitcoinExchange::parseRate(const std::string &rateStr, double &rate) const
     if (trimmed.empty())
         return false;
 
-    char *endPtr;
-    rate = std::strtod(trimmed.c_str(), &endPtr);
-    if (endPtr == trimmed.c_str() || *endPtr != '\0' || rate < 0)
+    double num;
+    try
+    {
+        std::size_t endPos = 0;
+        num = std::stod(trimmed, &endPos);
+        if (endPos != trimmed.size())
+        {
+            return false;
+        }
+    }
+    catch (const std::exception &)
+    {
         return false;
+    }
+    if (num < 0)
+        return false;
+
+    rate = num;
     return true;
 }
 
