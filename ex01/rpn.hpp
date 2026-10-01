@@ -8,15 +8,17 @@ class RPN
 public:
     RPN(){}
     ~RPN(){}
-    RPN(const RPN &other){}
-    RPN &operator=(const RPN &other){}
+    RPN(const RPN &other);
+    RPN &operator=(const RPN &other);
 
+    void calculate(const std::string &expression);
+    
 private:
     std::stack<double> _stack;          //store only numbers.
-    std::string _tokens;                //store input string.
-
+    std::string _operator_tokens;                //store input string.
+    
+    void processToken(const std::string &token);
     bool isOperator(const std::string &token) const;
     bool isNumber(const std::string &token) const;
-    void processToken(const std::string &token);
-    void Operation(char op);
+    void operation(char op);
 };
