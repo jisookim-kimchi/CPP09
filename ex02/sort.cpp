@@ -67,6 +67,38 @@ std::vector<std::pair<int, int>> Sort::makePairs(const std::vector<int> &vpArr, 
     return pairs;
 }
 
+//some error.
+std::vector<int> Sort::mergeInsertionSort(const std::vector<int> &arr)
+{
+    if (arr.size() <= 1)
+        return arr;
+
+    std::optional<int> sadSingle;
+    std::vector<std::pair<int, int>> pairs = makePairs(arr, sadSingle);
+    std::vector<int> bigNums;
+    for (const auto &p : pairs)
+        bigNums.push_back(p.second);
+
+    std::vector<int> sortedBigNumbers = mergeInsertionSort(bigNums);
+    std::vector<int> temp;
+    for (const auto &big : sortedBigNumbers)
+    {
+        for (const auto &pair : pairs)
+        {
+            if (pair.second == big)
+            {
+                std::cout << "Find Pair : (" << pair.first << ", " << pair.second << ")\n";
+                temp.push_back(pair.first);
+                break;
+            }
+        }
+    }
+
+    //TODO : small number insert in Jacobsthal sequence.
+    return sortedBigNumbers;
+}
+
+
 void Sort::printTest()
 {
     std::cout << "Input : ";
@@ -75,17 +107,10 @@ void Sort::printTest()
     std::cout << std::endl
     << std::endl;
 
-    std::optional<int> sadSingle;
-    std::vector<std::pair<int, int>> pairs = makePairs(_vec, sadSingle);
-
-    std::cout << "Pair : (small, big):\n";
-    for (size_t i = 0; i < pairs.size(); ++i)
-    {
-        std::cout << "  Pair " << i + 1 << ": (" << pairs[i].first << ", " << pairs[i].second << ")\n";
-    }
-
-    if (sadSingle.has_value())
-        std::cout << "(Sad Single): " << sadSingle.value() << "\n";
-    else
-        std::cout << "(Sad Single): x\n";
+    std::cout << "--- print mergeInsertionSort ---\n";
+    std::vector<int> result = mergeInsertionSort(_vec);
+    std::cout << "\nReturned sortedBigNumbers: ";
+    for (int i : result)
+        std::cout << i << " ";
+    std::cout << "\n";
 }

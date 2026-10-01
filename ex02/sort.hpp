@@ -31,6 +31,7 @@ private:
     bool _isSwapped = false;
     std::vector<int> _vec;
     std::deque<int> _deq;
+    std::vector<int> mergeInsertionSort(const std::vector<int> &arr);
     std::vector<std::pair<int, int>> makePairs(const std::vector<int> &vpArr, std::optional<int> &sadSingle);
     int fromChartoInt(const std::string &str);
 };
