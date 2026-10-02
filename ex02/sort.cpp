@@ -67,7 +67,6 @@ std::vector<std::pair<int, int>> Sort::makePairs(const std::vector<int> &vpArr, 
     return pairs;
 }
 
-//some error.
 std::vector<int> Sort::mergeInsertionSort(const std::vector<int> &arr)
 {
     if (arr.size() <= 1)
@@ -80,22 +79,29 @@ std::vector<int> Sort::mergeInsertionSort(const std::vector<int> &arr)
         bigNums.push_back(p.second);
 
     std::vector<int> sortedBigNumbers = mergeInsertionSort(bigNums);
-    std::vector<int> temp;
+    std::vector<int> storedSmallNumPairs;
     for (const auto &big : sortedBigNumbers)
     {
-        for (const auto &pair : pairs)
+        for (auto it = pairs.begin(); it != pairs.end(); ++it)
         {
-            if (pair.second == big)
+            if (it->second == big)
             {
-                std::cout << "Find Pair : (" << pair.first << ", " << pair.second << ")\n";
-                temp.push_back(pair.first);
+                storedSmallNumPairs.push_back(it->first);
+                pairs.erase(it);
                 break;
             }
-        }
+        }   
     }
+    std::vector<int> mergedBigAndSmall = sortedBigNumbers;
+    for (int small : storedSmallNumPairs)
+    {
+        mergedBigAndSmall.push_back(small);
+    }
+    if (sadSingle.has_value())
+        mergedBigAndSmall.push_back(sadSingle.value());
 
     //TODO : small number insert in Jacobsthal sequence.
-    return sortedBigNumbers;
+    return mergedBigAndSmall;
 }
 
 

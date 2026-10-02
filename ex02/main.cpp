@@ -2,9 +2,12 @@
 
 int main(int argc, char *argv[])
 {
+    const char *testArr[] = {"1", "2", "6", "7", "3", "9", "8", "4", "7", "10"};
+    (void)argv;
+    argc = sizeof(testArr) / sizeof(testArr[0]);
     try
     {
-        Sort sort(argc, argv);
+        Sort sort(argc, const_cast<char**>(testArr));
         sort.printTest();
     }
     catch (const std::exception &e)
