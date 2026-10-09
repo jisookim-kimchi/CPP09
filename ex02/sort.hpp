@@ -34,12 +34,113 @@ public:
     ~Sort() = default;
 
     void printTest();
+
+    template <typename Container>
+    Container mergeInsertionSort(const Container &arr);
+
+    template <typename Container>
+    std::vector<std::pair<int, int>> makePairs(const Container &vpArr, std::optional<int> &sadSingle);
+
 private:
     bool _isSwapped = false;
     std::vector<int> _vec;
     std::deque<int> _deq;
-    std::vector<int> mergeInsertionSort(const std::vector<int> &arr);
-    std::vector<std::pair<int, int>> makePairs(const std::vector<int> &vpArr, std::optional<int> &sadSingle);
-    //std::vector<int> fordJohnsonInsertion(const std::vector<int> &bigs, const std::vector<int> &smalls);
     int fromChartoInt(const std::string &str);
 };
+
+#include <algorithm>
+
+template <typename Container>
+std::vector<std::pair<int, int>> Sort::makePairs(const Container &vpArr, std::optional<int> &sadSingle)
+{
+    std::vector<std::pair<int, int>> pairs;
+
+    for (auto it = vpArr.begin(); it != vpArr.end() && (it + 1 != vpArr.end()); it += 2)
+    {
+        int first = *it;
+        int second = *(it + 1);
+        if (first > second)
+            pairs.push_back({second, first});
+        else
+            pairs.push_back({first, second});
+    }
+    if (vpArr.size() % 2 != 0)
+        sadSingle = vpArr.back();
+    return pairs;
+}
+
+template <typename Container>
+Container Sort::mergeInsertionSort(const Container &arr)
+{
+    if (arr.size() <= 1)
+        return arr;
+
+    std::optional<int> sadSingle;
+    std::vector<std::pair<int, int>> pairs = makePairs(arr, sadSingle);
+    Container bigNums;
+    for (const auto &p : pairs)
+    {
+        bigNums.push_back(p.second);
+    }
+
+    Container BigNumbers = mergeInsertionSort(bigNums);
+    Container SmallNumbers;
+    for (const auto &big : BigNumbers)
+    {
+        for (auto it = pairs.begin(); it != pairs.end(); ++it)
+        {
+            if (it->second == big)
+            {
+                SmallNumbers.push_back(it->first);
+                pairs.erase(it);
+                break;
+            }
+        }
+    }
+
+    Container res = BigNumbers;
+    if (!SmallNumbers.empty())
+    {
+        res.insert(res.begin(), SmallNumbers[0]);
+    }
+
+    // Jacobsthal sequence
+    std::vector<size_t> jacob;
+    jacob.push_back(1);
+    jacob.push_back(3);
+    while (jacob.back() < SmallNumbers.size())
+    {
+        size_t size = jacob.size();
+        jacob.push_back(NEXT_JACOB(jacob[size - 1], jacob[size - 2]));
+    }
+
+    std::vector<size_t> insertOrder;
+    size_t lastPos = 1;
+    for (size_t i = 1; i < jacob.size(); i++)
+    {
+        size_t stopPos = std::min((size_t)SmallNumbers.size(), jacob[i]);
+        for (size_t idx = stopPos; idx > lastPos; idx--)
+        {
+            insertOrder.push_back(idx - 1);
+        }
+        lastPos = jacob[i];
+        if (lastPos >= SmallNumbers.size())
+            break;
+    }
+
+    for (size_t i : insertOrder)
+    {
+        int valToInsert = SmallNumbers[i];
+        auto maxRange = std::find(res.begin(), res.end(), BigNumbers[i]);
+        auto pos = std::lower_bound(res.begin(), maxRange, valToInsert);
+        res.insert(pos, valToInsert);
+    }
+
+    if (sadSingle.has_value())
+    {
+        auto pos = std::lower_bound(res.begin(), res.end(), sadSingle.value());
+        res.insert(pos, sadSingle.value());
+    }
+
+    return res;
+}

@@ -2,7 +2,7 @@
 
 int main(int argc, char *argv[])
 {
-    const char *testArr[] = {"1", "2", "6", "7", "3", "9", "8", "4", "7", "10"};
+    const char *testArr[] = {"./sort", "1", "2", "6", "7", "3", "9", "8"};
     (void)argv;
     argc = sizeof(testArr) / sizeof(testArr[0]);
     try
