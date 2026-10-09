@@ -1,8 +1,8 @@
-NAME = rpn
+NAME = RPN
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++17 -g
-HEADER = rpn.hpp
-SRCS = main.cpp rpn.cpp
+HEADER = RPN.hpp
+SRCS = main.cpp RPN.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(NAME)

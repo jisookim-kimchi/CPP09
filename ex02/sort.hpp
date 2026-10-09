@@ -17,6 +17,13 @@
 
 
 */
+
+/**
+    @a : previous jacob number
+    @b : before previous jacob number
+*/
+#define NEXT_JACOB(a, b) ((a) + 2 * (b))
+
 class Sort
 {
 public:
@@ -33,5 +40,6 @@ private:
     std::deque<int> _deq;
     std::vector<int> mergeInsertionSort(const std::vector<int> &arr);
     std::vector<std::pair<int, int>> makePairs(const std::vector<int> &vpArr, std::optional<int> &sadSingle);
+    //std::vector<int> fordJohnsonInsertion(const std::vector<int> &bigs, const std::vector<int> &smalls);
     int fromChartoInt(const std::string &str);
 };

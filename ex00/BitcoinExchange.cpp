@@ -108,6 +108,7 @@ bool BitcoinExchange::parseValue(const std::string &valueStr, double &value) con
 
     if (trimmed.empty())
     {
+        std::cout.flush();
         std::cerr << "Error: bad input => " << valueStr << std::endl;
         return false;
     }
@@ -118,22 +119,26 @@ bool BitcoinExchange::parseValue(const std::string &valueStr, double &value) con
         num = std::stod(trimmed, &endPos);
         if (endPos != trimmed.size())
         {
+            std::cout.flush();
             std::cerr << "Error: bad input => " << trimmed << std::endl;
             return false;
         }
     }
     catch (const std::exception &)
     {
+        std::cout.flush();
         std::cerr << "Error: bad input => " << trimmed << std::endl;
         return false;
     }
     if (num < 0)
     {
+        std::cout.flush();
         std::cerr << "Error: not a positive number." << std::endl;
         return false;
     }
     if (num > 1000)
     {
+        std::cout.flush();
         std::cerr << "Error: too large a number." << std::endl;
         return false;
     }
@@ -179,11 +184,30 @@ bool BitcoinExchange::parseRate(const std::string &rateStr, double &rate) const
     return true;
 }
 
+/**
+    @brief : Format number into string without scientific notation and remove trailing zeros.
+    @func : find_last_not_of :  Find the index of the last character not equal to '0'.
+*/
+static std::string formatNumber(double num)
+{
+    std::ostringstream oss;
+    oss << std::fixed << std::setprecision(6) << num;
+    std::string str = oss.str();
+    if (str.find('.') != std::string::npos)
+    {
+        str.erase(str.find_last_not_of('0') + 1, std::string::npos);
+        if (!str.empty() && str[str.size() - 1] == '.')
+            str.erase(str.size() - 1);
+    }
+    return str;
+}
+
 void BitcoinExchange::processLine(const std::string &line)
 {
     std::string::size_type separateBar = line.find('|');
     if (separateBar == std::string::npos)
     {
+        std::cout.flush();
         std::cerr << "Error: bad input => " << line << std::endl;
         return;
     }
@@ -192,7 +216,8 @@ void BitcoinExchange::processLine(const std::string &line)
     std::string date;
     if (!parseDate(rawDate, date))
     {
-        std::cerr << "Error: bad input => " << rawDate << std::endl;
+        std::cout.flush();
+        std::cerr << "Error: bad input => " << (date.empty() ? line : date) << std::endl;
         return;
     }
 
@@ -203,11 +228,12 @@ void BitcoinExchange::processLine(const std::string &line)
     try
     {
         double exchangeRate = findClosestRate(date);
-        std::cout << date << " => " << value << " = "
-                  << value * exchangeRate << std::endl;
+        std::cout << date << " => " << formatNumber(value) << " = "
+                  << formatNumber(value * exchangeRate) << std::endl;
     }
     catch (const std::runtime_error &e)
     {
+        std::cout.flush();
         std::cerr << e.what() << std::endl;
     }
 }
@@ -217,7 +243,7 @@ void BitcoinExchange::readInputFile(const std::string &path)
     std::ifstream file(path.c_str());
     if (!file.is_open())
     {
-        throw std::runtime_error("Error : Could not open file : " + path);
+        throw std::runtime_error("Error: could not open file : " + path);
     }
     std::string line;
     std::getline(file, line);
@@ -227,31 +253,22 @@ void BitcoinExchange::readInputFile(const std::string &path)
     }
 }
 
-
 /** 
-    @brief : *compare the date in the `input.txt` with dates in `data.csv`.
-              find the closest date that is not later than the input date,
-              then return its exchange rate.
+    @brief : compare the date in the `input.txt` with dates in `data.csv`.
+             find the closest date that is not later than the input date,
+             then return its exchange rate using O(log N) std::map::upper_bound.
 */
 double BitcoinExchange::findClosestRate(const std::string &input_date) const
 {
-    std::map<std::string, double>::const_iterator it;
-    std::map<std::string, double>::const_iterator closest;
-    
-    closest = _exchangeRates.end();
-    
-    for (it = _exchangeRates.begin(); it != _exchangeRates.end(); ++it)
-    {
-        if (it->first > input_date)
-            break;
-        closest = it;
-        if (it->first == input_date)
-            return it->second;
-    }
-    if (closest == _exchangeRates.end())
+    if (_exchangeRates.empty())
+        throw std::runtime_error("Error: database is empty.");
+
+    std::map<std::string, double>::const_iterator it = _exchangeRates.upper_bound(input_date);
+    if (it == _exchangeRates.begin())
         throw std::runtime_error("Error: date is too old.");
 
-    return closest->second;
+    --it;
+    return it->second;
 }
 
 
