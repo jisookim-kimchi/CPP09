@@ -5,7 +5,8 @@
 #include <deque>
 #include <stdexcept>
 #include <optional>
-
+#include <algorithm>
+#include <chrono>
 /*
     n개의 원소를 2개씩 짝 짓는다...
     홀수개일 경우 마지막 1개는 따로 보관한다..
@@ -41,14 +42,22 @@ public:
     template <typename Container>
     std::vector<std::pair<int, int>> makePairs(const Container &vpArr, std::optional<int> &sadSingle);
 
+    template <typename Container>
+    std::pair<Container, double> measureSort(const Container &container)
+    {
+        auto start = std::chrono::steady_clock::now();
+        Container sorted = mergeInsertionSort(container);
+        auto end = std::chrono::steady_clock::now();
+        double elapsedMicroseconds = std::chrono::duration<double, std::micro>(end - start).count();
+        return {sorted, elapsedMicroseconds};
+    }
+
 private:
     bool _isSwapped = false;
     std::vector<int> _vec;
     std::deque<int> _deq;
     int fromChartoInt(const std::string &str);
 };
-
-#include <algorithm>
 
 template <typename Container>
 std::vector<std::pair<int, int>> Sort::makePairs(const Container &vpArr, std::optional<int> &sadSingle)
