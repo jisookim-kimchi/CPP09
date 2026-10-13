@@ -1,11 +1,11 @@
-#include "sort.hpp"
+#include "pMergeMe.hpp"
 #include <climits>
 #include <algorithm>
 /**
     @brief : get int from string.
     @param str : argv[1], input value from Program argument to sort.
 */
-int Sort::fromChartoInt(const std::string &str)
+int pMergeMe::fromChartoInt(const std::string &str)
 {
     if (str.empty())
     {
@@ -17,7 +17,7 @@ int Sort::fromChartoInt(const std::string &str)
     {
         if (str[i] < '0' || str[i] > '9')
         {
-            throw std::invalid_argument("Error: str is not digit");
+            throw std::invalid_argument("Error: str is not positive integer");
         }
         val = val * 10 + (str[i] - '0');
         if (val > INT_MAX)
@@ -29,7 +29,7 @@ int Sort::fromChartoInt(const std::string &str)
     return static_cast<int>(val);
 }
 
-Sort::Sort(int argc, char *argv[]) : _isSwapped(false)
+pMergeMe::pMergeMe(int argc, char *argv[]) : _isSwapped(false)
 {
     if (argc < 2)
         throw std::invalid_argument("Error: input is empty");
@@ -43,27 +43,24 @@ Sort::Sort(int argc, char *argv[]) : _isSwapped(false)
     }
 }
 
-void Sort::printTest()
+void pMergeMe::printResult()
 {
-    std::cout << "Input (vector) : ";
-    for (auto it = _vec.begin(); it != _vec.end(); it++)
-        std::cout << *it << " ";
+    std::cout << "Before: ";
+    for (int num : _vec)
+        std::cout << num << " ";
     std::cout << std::endl;
 
-    std::vector<int> resultVec = mergeInsertionSort(_vec);
-    std::cout << "Sorted (vector): ";
-    for (int i : resultVec)
-        std::cout << i << " ";
-    std::cout << "\n\n";
+    auto [resultVec, vecTime] = measureSort(_vec);
+    auto [resultDeq, deqTime] = measureSort(_deq);
 
-    std::cout << "Input (deque)  : ";
-    for (auto it = _deq.begin(); it != _deq.end(); it++)
-        std::cout << *it << " ";
+    std::cout << "After:  ";
+    for (int num : resultVec)
+        std::cout << num << " ";
     std::cout << std::endl;
 
-    std::deque<int> resultDeq = mergeInsertionSort(_deq);
-    std::cout << "Sorted (deque) : ";
-    for (int i : resultDeq)
-        std::cout << i << " ";
-    std::cout << "\n";
+    std::cout << "Time to process a range of " << _vec.size()
+              << " elements with std::vector : " << std::fixed << std::setprecision(5) << vecTime << " us" << std::endl;
+    std::cout << "Time to process a range of " << _deq.size()
+              << " elements with std::deque : " << std::fixed << std::setprecision(5) << deqTime << " us" << std::endl;
 }
+

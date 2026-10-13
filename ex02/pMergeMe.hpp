@@ -7,6 +7,7 @@
 #include <optional>
 #include <algorithm>
 #include <chrono>
+#include <iomanip>
 /*
     n개의 원소를 2개씩 짝 짓는다...
     홀수개일 경우 마지막 1개는 따로 보관한다..
@@ -25,16 +26,16 @@
 */
 #define NEXT_JACOB(a, b) ((a) + 2 * (b))
 
-class Sort
+class pMergeMe
 {
 public:
-    Sort(int argc, char *argv[]);
-    Sort(const Sort &other) = default;
-    Sort &operator=(const Sort &other) = default;
-    Sort() = default;
-    ~Sort() = default;
+    pMergeMe(int argc, char *argv[]);
+    pMergeMe(const pMergeMe &other) = default;
+    pMergeMe &operator=(const pMergeMe &other) = default;
+    pMergeMe() = default;
+    ~pMergeMe() = default;
 
-    void printTest();
+    void printResult();
 
     template <typename Container>
     Container mergeInsertionSort(const Container &arr);
@@ -60,7 +61,7 @@ private:
 };
 
 template <typename Container>
-std::vector<std::pair<int, int>> Sort::makePairs(const Container &vpArr, std::optional<int> &sadSingle)
+std::vector<std::pair<int, int>> pMergeMe::makePairs(const Container &vpArr, std::optional<int> &sadSingle)
 {
     std::vector<std::pair<int, int>> pairs;
 
@@ -79,13 +80,13 @@ std::vector<std::pair<int, int>> Sort::makePairs(const Container &vpArr, std::op
 }
 
 template <typename Container>
-Container Sort::mergeInsertionSort(const Container &arr)
+Container pMergeMe::mergeInsertionSort(const Container &container)
 {
-    if (arr.size() <= 1)
-        return arr;
+    if (container.size() <= 1)
+        return container;
 
     std::optional<int> sadSingle;
-    std::vector<std::pair<int, int>> pairs = makePairs(arr, sadSingle);
+    std::vector<std::pair<int, int>> pairs = makePairs(container, sadSingle);
     Container bigNums;
     for (const auto &p : pairs)
     {

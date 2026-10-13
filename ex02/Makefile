@@ -1,8 +1,8 @@
-NAME = sort
+NAME = pMergeMe
 CXX = c++
 CXXFLAGS = -Wall -Wextra -Werror -std=c++17 -g
-HEADER = sort.hpp
-SRCS = main.cpp sort.cpp
+HEADER = pMergeMe.hpp
+SRCS = main.cpp pMergeMe.cpp
 OBJS = $(SRCS:.cpp=.o)
 
 all: $(NAME)
